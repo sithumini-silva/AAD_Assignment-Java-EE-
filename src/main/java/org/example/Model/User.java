@@ -8,7 +8,6 @@ public class User {
     private String role;
     private String department;
 
-    // Constructors
     public User() {}
 
     public User(String name, String email, String password, String role, String department) {
@@ -19,7 +18,6 @@ public class User {
         this.department = department;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }

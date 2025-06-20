@@ -27,11 +27,13 @@ public class UserDAO {
                 user.setDepartment(rs.getString("department"));
                 users.add(user);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return users;
-    }    public boolean registerUser(User user) {
+    }
+    public boolean registerUser(User user) {
         String sql = "INSERT INTO users (name, email, password, role, department) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();

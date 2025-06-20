@@ -18,13 +18,11 @@ public class DBConnection {
         dataSource.setMaxIdle(10);
         dataSource.setMaxTotal(25);
         dataSource.setValidationQuery("SELECT 1");
+
     }
 
     public static Connection getConnection() throws SQLException {
         return dataSource.getConnection();
     }
 
-    public static BasicDataSource getDataSource() {
-        return dataSource;
-    }
 }

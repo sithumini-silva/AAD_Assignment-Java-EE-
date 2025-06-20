@@ -84,11 +84,6 @@
             transform: translateY(-2px);
         }
 
-        .btn-secondary {
-            border-radius: 30px;
-            font-weight: 600;
-        }
-
         .character-count {
             font-size: 0.8rem;
             text-align: right;
@@ -111,6 +106,25 @@
             color: var(--secondary-color);
             padding: 0.375rem 0;
         }
+        .btn-secondary {
+            background: #27ae60;  /* Green accent */
+            color: #fff;
+            border: none;
+            text-transform: uppercase;
+            font-weight: 600;
+            display: inline-block;
+            transition: background 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+        }
+
+        .btn-secondary:hover {
+            background: #219150;
+            box-shadow: 0 0 8px #219150;
+            color: #fff;
+        }
+
     </style>
 </head>
 <body>
@@ -170,9 +184,7 @@
         </div>
 
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-            <button type="reset" class="btn btn-secondary me-md-2">
-                <i class="fas fa-times me-1"></i> Clear
-            </button>
+            <a href="employee.jsp" class="btn btn-secondary mt-3">Back to Dashboard</a>
             <button type="submit" class="btn btn-submit">
                 <i class="fas fa-paper-plane me-1"></i> Submit Complaint
             </button>

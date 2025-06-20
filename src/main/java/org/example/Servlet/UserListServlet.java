@@ -16,8 +16,28 @@ public class UserListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<User> users = userDAO.getAllUsers();
-        request.setAttribute("users", users);  // JSPට data දීම
-        request.getRequestDispatcher("/user-list.jsp").forward(request, response);
+
+        // Optional: Check if user is logged in (session check)
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        try {
+            // Fetch all users from DB
+            List<User> users = userDAO.getAllUsers();
+
+            // Set users attribute for JSP
+            request.setAttribute("users", users);
+
+            // Forward to JSP page
+            request.getRequestDispatcher("/user-list.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Set error message and forward to error page or same JSP with error info
+            request.setAttribute("errorMessage", "Failed to load user list.");
+            request.getRequestDispatcher("/user-list.jsp").forward(request, response);
+        }
     }
 }

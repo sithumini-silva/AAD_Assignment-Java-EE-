@@ -34,7 +34,6 @@ public class AdminServlet extends HttpServlet {
 
             req.setAttribute("users", users);
             req.setAttribute("complaints", complaints);
-
             req.getRequestDispatcher("/admin.jsp").forward(req, resp);
         } catch (Exception e) {
             e.printStackTrace();

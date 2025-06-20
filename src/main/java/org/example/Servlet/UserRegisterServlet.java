@@ -22,11 +22,13 @@ public class UserRegisterServlet extends HttpServlet {
         String email = request.getParameter("user_email");
         String password = request.getParameter("user_password");
         String role = request.getParameter("user_role");
+        // Set department based on role
         String department = "admin".equals(role) ? "Administration" : request.getParameter("user_department");
 
         // Validate input
         if (name == null || email == null || password == null || role == null ||
-                name.isEmpty() || email.isEmpty() || password.isEmpty() || role.isEmpty()) {
+                name.isEmpty() || email.isEmpty() || password.isEmpty() || role.isEmpty() ||
+                ("employee".equals(role) && (department == null || department.isEmpty()))) {
             request.setAttribute("error", "All fields are required");
             request.getRequestDispatcher("signUp.jsp").forward(request, response);
             return;
@@ -40,7 +42,6 @@ public class UserRegisterServlet extends HttpServlet {
             return;
         }
 
-        // Create user object
         User user = new User(name, email, password, role, department);
 
         // Register user
@@ -50,7 +51,7 @@ public class UserRegisterServlet extends HttpServlet {
         } else {
             // Registration failed
             request.setAttribute("error", "Registration failed. Please try again.");
-            request.getRequestDispatcher("register.jsp").forward(request, response);
+            request.getRequestDispatcher("signUp.jsp").forward(request, response);
         }
     }
 

@@ -220,9 +220,9 @@
         <thead class="table-light">
         <tr>
             <th>Id</th>
+            <th>Name</th>
             <th>Title</th>
             <th>Description</th>
-            <th>Date Submitted</th>
             <th>Status</th>
             <th>Action</th>
         </tr>

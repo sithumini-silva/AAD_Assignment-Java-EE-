@@ -12,17 +12,27 @@
     <h2 class="mb-4">Update Complaint</h2>
 
     <%
-        String success = (String) request.getAttribute("success");
-        String error = (String) request.getAttribute("error");
+        String success = request.getParameter("success");
+        String error = request.getParameter("error");
         Complaint complaint = (Complaint) request.getAttribute("complaint");
     %>
 
     <% if (success != null) { %>
-    <div class="alert alert-success"><%= success %></div>
+    <div class="alert alert-success">Complaint updated successfully.</div>
     <% } %>
 
     <% if (error != null) { %>
-    <div class="alert alert-danger"><%= error %></div>
+    <div class="alert alert-danger">
+        <%=
+        "missing_fields".equals(error) ? "Please fill in all required fields." :
+                "unauthorized".equals(error) ? "You are not authorized to update this complaint." :
+                        "update_failed".equals(error) ? "Update failed. Please try again." :
+                                "server_error".equals(error) ? "Server error occurred." :
+                                        "invalid_cid".equals(error) ? "Invalid complaint ID." :
+                                                "missing_cid".equals(error) ? "Complaint ID is missing." :
+                                                        "An error occurred."
+        %>
+    </div>
     <% } %>
 
     <form action="update-complaint" method="post">
@@ -30,27 +40,29 @@
 
         <div class="mb-3">
             <label for="title" class="form-label">Title</label>
-            <input
-                    type="text"
-                    class="form-control"
-                    id="title"
-                    name="title"
-                    value="<%= (complaint != null) ? complaint.getTitle() : "" %>"
-                    required />
+            <input type="text" class="form-control" id="title" name="title"
+                   value="<%= (complaint != null) ? complaint.getTitle() : "" %>" required>
         </div>
 
         <div class="mb-3">
             <label for="description" class="form-label">Description</label>
-            <textarea
-                    class="form-control"
-                    id="description"
-                    name="description"
-                    rows="5"
-                    required><%= (complaint != null) ? complaint.getDescription() : "" %></textarea>
+            <textarea class="form-control" id="description" name="description" rows="5" required><%=
+            (complaint != null) ? complaint.getDescription() : ""
+            %></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary">Update Complaint</button>
-        <a href="complaint.jsp" class="btn btn-secondary">Cancel</a>
+        <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status" required>
+                <option value="">Select status</option>
+                <option value="pending" <%= (complaint != null && "pending".equalsIgnoreCase(complaint.getStatus())) ? "selected" : "" %>>Pending</option>
+                <option value="in_progress" <%= (complaint != null && "in_progress".equalsIgnoreCase(complaint.getStatus())) ? "selected" : "" %>>In Progress</option>
+                <option value="resolved" <%= (complaint != null && "resolved".equalsIgnoreCase(complaint.getStatus())) ? "selected" : "" %>>Resolved</option>
+                <option value="rejected" <%= (complaint != null && "rejected".equalsIgnoreCase(complaint.getStatus())) ? "selected" : "" %>>Rejected</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update</button>
     </form>
 </div>
 </body>

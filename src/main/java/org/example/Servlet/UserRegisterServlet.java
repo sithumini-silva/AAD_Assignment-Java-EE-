@@ -53,4 +53,5 @@ public class UserRegisterServlet extends HttpServlet {
             request.getRequestDispatcher("register.jsp").forward(request, response);
         }
     }
+
 }

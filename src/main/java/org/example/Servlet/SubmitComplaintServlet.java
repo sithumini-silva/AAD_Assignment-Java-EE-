@@ -1,63 +1,65 @@
 package org.example.Servlet;
 
+import org.example.DAO.ComplaintDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.DAO.ComplaintDAO;
+import jakarta.servlet.http.HttpSession;
+import org.example.Model.Complaint;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
 
-@WebServlet(name = "ComplaintServlet", urlPatterns = {"/ComplaintServlet"})
-public class ComplaintServlet extends HttpServlet {
-    private final ComplaintDAO complaintDAO = new ComplaintDAO();
+@WebServlet("/submit-complaint")
+public class SubmitComplaintServlet extends HttpServlet {
+    private ComplaintDAO complaintDAO;
 
     @Override
+    public void init() throws ServletException {
+        complaintDAO = new ComplaintDAO();
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
 
-        PrintWriter out = response.getWriter();
-        Map<String, Object> result = new HashMap<>();
+        HttpSession session = request.getSession();
 
-        try {
-            // Read JSON data from request
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = request.getReader().readLine()) != null) {
-                sb.append(line);
-            }
-            String json = sb.toString();
-
-            // Parse JSON manually
-            JSONObject jsonObject = new JSONObject(json);
-            Complaint complaint = new Complaint();
-            complaint.setUserId(jsonObject.getString("user_id"));
-            complaint.setEmployeeName(jsonObject.getString("employee_name"));
-            complaint.setTitle(jsonObject.getString("title"));
-            complaint.setDescription(jsonObject.getString("description"));
-            complaint.setStatus("PENDING"); // Default status
-
-            // Save complaint to database
-            boolean success = complaintDAO.createComplaint(complaint);
-
-            if (success) {
-                result.put("success", true);
-                result.put("message", "Complaint submitted successfully!");
-            } else {
-                result.put("success", false);
-                result.put("message", "Failed to submit complaint. Please try again.");
-            }
-        } catch (Exception e) {
-            result.put("success", false);
-            result.put("message", "An error occurred: " + e.getMessage());
+        // Check if user is logged in
+        if (session.getAttribute("userId") == null || session.getAttribute("userName") == null) {
+            request.setAttribute("errorMessage", "Please login to submit a complaint");
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            return;
         }
 
-        out.print(new JSONObject(result).toString());
-        out.flush();
+        try {
+            int userId = (Integer) session.getAttribute("userId");
+            String employeeName = (String) session.getAttribute("userName");
+            String title = request.getParameter("title");
+            String description = request.getParameter("description");
+
+            // Validate inputs
+            if (title == null || title.trim().isEmpty() ||
+                    description == null || description.trim().isEmpty()) {
+                request.setAttribute("errorMessage", "Title and description are required!");
+                request.getRequestDispatcher("/submitComplaint.jsp").forward(request, response);
+                return;
+            }
+
+            Complaint complaint = new Complaint(userId, employeeName, title, description, "pending");
+
+            if (complaintDAO.saveComplaint(complaint)) {
+                request.setAttribute("successMessage", "Complaint submitted successfully!");
+            } else {
+                request.setAttribute("errorMessage", "Failed to submit complaint. Please try again.");
+            }
+
+            request.getRequestDispatcher("/complaint.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "An error occurred: " + e.getMessage());
+            request.getRequestDispatcher("/submitComplaint.jsp").forward(request, response);
+        }
     }
 }

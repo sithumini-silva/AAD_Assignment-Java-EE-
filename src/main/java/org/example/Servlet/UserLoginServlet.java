@@ -15,6 +15,7 @@ import java.io.IOException;
 public class UserLoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -27,20 +28,34 @@ public class UserLoginServlet extends HttpServlet {
             return;
         }
 
+        // Authenticate user
         UserDAO userDAO = new UserDAO();
         User user = userDAO.authenticate(email, password);
 
         if (user != null) {
-            // Create session and store user details
             HttpSession session = request.getSession();
+
+            // Set full User object (if needed elsewhere)
             session.setAttribute("user", user);
 
-            // Redirect based on role
-            if ("admin".equals(user.getRole())) {
-                response.sendRedirect("admin-dashboard.jsp");
+            // Set userId and userName separately for easier access
+            session.setAttribute("userId", user.getId());
+            session.setAttribute("userName", user.getName());
+
+            // Debug log (optional)
+            System.out.println("Login successful: ID=" + user.getId() + ", Name=" + user.getName() + ", Role=" + user.getRole());
+
+            String role = user.getRole();
+
+            if ("admin".equalsIgnoreCase(role)) {
+                response.sendRedirect("admin.jsp");
+            } else if ("employee".equalsIgnoreCase(role)) {
+                response.sendRedirect("employee.jsp");
             } else {
-                response.sendRedirect("employee-dashboard.jsp");
+                request.setAttribute("error", "Unauthorized role");
+                request.getRequestDispatcher("login.jsp").forward(request, response);
             }
+
         } else {
             request.setAttribute("error", "Invalid email or password");
             request.getRequestDispatcher("login.jsp").forward(request, response);

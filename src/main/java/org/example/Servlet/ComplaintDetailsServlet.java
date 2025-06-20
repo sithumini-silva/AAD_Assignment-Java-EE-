@@ -1,15 +1,18 @@
 package org.example.Servlet;
 
-import jakarta.servlet.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
 import org.example.DAO.ComplaintDAO;
 import org.example.Model.Complaint;
 
 import java.io.IOException;
+import java.util.*;
 
-@WebServlet(name = "ComplaintViewServlet", value = "/complaint-view")
-public class ComplaintViewServlet extends HttpServlet {
+@WebServlet("/complaint-details")
+public class ComplaintDetailsServlet extends HttpServlet {
+    private final ObjectMapper mapper = new ObjectMapper();
     private ComplaintDAO complaintDAO;
 
     @Override
@@ -17,41 +20,41 @@ public class ComplaintViewServlet extends HttpServlet {
         complaintDAO = new ComplaintDAO();
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
 
-        HttpSession session = request.getSession();
-
-        // Check if user is logged in
-        if (session.getAttribute("userId") == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
+        Map<String, Object> response = new HashMap<>();
 
         try {
-            int complaintId = Integer.parseInt(request.getParameter("id"));
-            int userId = (Integer) session.getAttribute("userId");
+            List<Complaint> complaints = complaintDAO.getAllComplaints();
+            List<Map<String, Object>> data = new ArrayList<>();
 
-            // Get complaint details
-            Complaint complaint = complaintDAO.getComplaintById(complaintId);
-
-            // Verify the complaint belongs to the logged-in user
-            if (complaint == null || complaint.getUserId() != userId) {
-                request.setAttribute("errorMessage", "Complaint not found or access denied");
-                request.getRequestDispatcher("/my-complaints.jsp").forward(request, response);
-                return;
+            for (Complaint c : complaints) {
+                Map<String, Object> complaint = new LinkedHashMap<>();
+                complaint.put("id", c.getComplaintId());
+                complaint.put("userId", c.getUserId());
+                complaint.put("employee", c.getEmployeeName());
+                complaint.put("title", c.getTitle());
+                complaint.put("description", c.getDescription());
+                complaint.put("status", c.getStatus());
+                data.add(complaint);
             }
 
-            request.setAttribute("complaint", complaint);
-            request.getRequestDispatcher("/complaint-view.jsp").forward(request, response);
+            response.put("success", true);
+            response.put("data", data);
 
-        } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Invalid complaint ID");
-            request.getRequestDispatcher("/my-complaints.jsp").forward(request, response);
+            // Debug print
+            System.out.println("Sending response: " + response);
+
         } catch (Exception e) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.put("success", false);
+            response.put("message", "Error: " + e.getMessage());
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Error retrieving complaint: " + e.getMessage());
-            request.getRequestDispatcher("/my-complaints.jsp").forward(request, response);
         }
+
+        mapper.writeValue(resp.getWriter(), response);
     }
 }

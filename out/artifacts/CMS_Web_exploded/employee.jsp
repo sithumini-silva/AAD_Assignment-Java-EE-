@@ -364,6 +364,67 @@
         .toast i {
             color: var(--primary);
         }
+        .nav-link, .btn-neon {
+            display: inline-block;
+            padding: 10px 70px;
+            border-radius: 25px;
+            background: var(--primary);
+            color: var(--bg-dark) !important;
+            font-weight: bold;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.95rem;
+            margin: 5px 0;
+        }
+
+        /* Hover effects for both */
+        .nav-link:hover, .btn-neon:hover {
+            background: var(--primary-dark);
+            color: var(--text-light) !important;
+            box-shadow: 0 0 15px rgba(0, 234, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Shine animation for both */
+        .nav-link::after, .btn-neon::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.2),
+                    transparent
+            );
+            transform: translateX(-100%);
+            transition: 0.5s;
+        }
+
+        .nav-link:hover::after, .btn-neon:hover::after {
+            transform: translateX(100%);
+        }
+
+        /* Specific adjustments for nav-items */
+        .nav-item {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: inline-block;
+        }
+
+        /* Make sure text-white works */
+        .text-white {
+            color: var(--bg-dark) !important;
+        }
     </style>
 </head>
 
@@ -432,21 +493,22 @@
         <i class="fas fa-comment-dots"></i>
         <h3>Submit Complaint</h3>
         <p>File a new complaint to the admin team with detailed information and attachments.</p>
-        <button class="btn-neon" onclick="location.href='complaint.jsp'">Submit</button>
+        <li class="nav-item"><a class="nav-link text-white" href="<%= request.getContextPath() %>/complaint.jsp"> Submit </a></li>
     </div>
 
     <div class="card animate__animated animate__fadeIn animate__delay-2s">
         <i class="fas fa-list"></i>
         <h3>View My Complaints</h3>
         <p>Track the status of your submitted complaints with real-time updates and history.</p>
-        <button class="btn-neon" onclick="location.href='complaintList.jsp'">View</button>
+<%--        <button class="btn-neon" onclick="location.href='complaintList.jsp'">View</button>--%>
+        <li class="nav-item"><a class="nav-link text-white" href="<%= request.getContextPath() %>/complaint-details"> View </a></li>
     </div>
 
     <div class="card animate__animated animate__fadeIn animate__delay-3s">
         <i class="fas fa-edit"></i>
         <h3>Manage Complaints</h3>
         <p>Edit or remove existing complaints before they are processed by the admin team.</p>
-        <button class="btn-neon" onclick="location.href='manage-complaints.jsp'">Manage</button>
+        <li class="nav-item"><a class="nav-link text-white" href="<%= request.getContextPath() %>/complaint-details"> Manage </a></li>
     </div>
 
     <div class="card animate__animated animate__fadeIn animate__delay-4s">

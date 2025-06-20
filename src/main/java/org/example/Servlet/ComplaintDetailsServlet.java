@@ -1,9 +1,11 @@
 package org.example.Servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.example.DAO.ComplaintDAO;
 import org.example.Model.Complaint;
 
@@ -12,49 +14,34 @@ import java.util.*;
 
 @WebServlet("/complaint-details")
 public class ComplaintDetailsServlet extends HttpServlet {
-    private final ObjectMapper mapper = new ObjectMapper();
-    private ComplaintDAO complaintDAO;
-
-    @Override
-    public void init() throws ServletException {
-        complaintDAO = new ComplaintDAO();
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-
-        Map<String, Object> response = new HashMap<>();
+        System.out.println(">> complaint-details servlet reached");
 
         try {
+            ComplaintDAO complaintDAO = new ComplaintDAO();
             List<Complaint> complaints = complaintDAO.getAllComplaints();
-            List<Map<String, Object>> data = new ArrayList<>();
 
-            for (Complaint c : complaints) {
-                Map<String, Object> complaint = new LinkedHashMap<>();
-                complaint.put("id", c.getComplaintId());
-                complaint.put("userId", c.getUserId());
-                complaint.put("employee", c.getEmployeeName());
-                complaint.put("title", c.getTitle());
-                complaint.put("description", c.getDescription());
-                complaint.put("status", c.getStatus());
-                data.add(complaint);
-            }
+            System.out.println("Complaint count: " + complaints.size());
 
-            response.put("success", true);
-            response.put("data", data);
+            HttpSession session = req.getSession(false);
 
-            // Debug print
-            System.out.println("Sending response: " + response);
+            if (session == null || session.getAttribute("userId") == null) {
+                System.out.println("The user Id is null");
+                // resp.sendRedirect(resp.encodeRedirectURL( req.getContextPath() + "/login.jsp"));
+                return;
+            }    String userId = session.getAttribute("userId").toString();
+            System.out.println("The user Id is: "+ userId);
 
+            req.setAttribute("complaints", complaints);
+            req.getRequestDispatcher("/complaintList.jsp").forward(req, resp);
         } catch (Exception e) {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.put("success", false);
-            response.put("message", "Error: " + e.getMessage());
             e.printStackTrace();
+            req.setAttribute("errorMessage", "Failed to load complaint list.");
+            req.getRequestDispatcher("/complaintList.jsp").forward(req, resp);
         }
-
-        mapper.writeValue(resp.getWriter(), response);
     }
+
+
 }

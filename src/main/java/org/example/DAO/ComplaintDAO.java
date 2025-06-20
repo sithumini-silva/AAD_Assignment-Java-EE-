@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ComplaintDAO {
+
     public List<Complaint> getAllComplaints() throws SQLException {
         List<Complaint> complaints = new ArrayList<>();
         String sql = "SELECT complaint_id, user_id, employee_name, title, description, status FROM complaints";
@@ -53,26 +54,40 @@ public class ComplaintDAO {
             return true;
         }
     }
-    public boolean updateComplaintStatus(int complaintId, String status, String remarks) throws SQLException {
-        String sql = "UPDATE complaints SET status = ?, remarks = ? WHERE complaint_id = ?";
+    public boolean updateComplaint(int complaintId, String title, String description) throws SQLException {
+        String sql = "UPDATE complaints SET title = ?, description = ? WHERE complaint_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, status);
-            stmt.setString(2, remarks);
+
+            stmt.setString(1, title);
+            stmt.setString(2, description);
             stmt.setInt(3, complaintId);
 
-            return stmt.executeUpdate() > 0;
+            int rows = stmt.executeUpdate();
+            return rows > 0;
         }
     }
 
-    public boolean deleteComplaint(int complaintId) throws SQLException {
-        String sql = "DELETE FROM complaints WHERE complaint_id = ?";
-
+    public Complaint getComplaintById(int complaintId) throws SQLException {
+        String sql = "SELECT complaint_id, user_id, employee_name, title, description, status FROM complaints WHERE complaint_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setInt(1, complaintId);
-            return stmt.executeUpdate() > 0;
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Complaint c = new Complaint();
+                    c.setComplaintId(rs.getInt("complaint_id"));
+                    c.setUserId(rs.getInt("user_id"));
+                    c.setEmployeeName(rs.getString("employee_name"));
+                    c.setTitle(rs.getString("title"));
+                    c.setDescription(rs.getString("description"));
+                    c.setStatus(rs.getString("status"));
+                    return c;
+                }
+            }
         }
+        return null;
     }
 }

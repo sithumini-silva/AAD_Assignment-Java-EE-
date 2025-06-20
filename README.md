@@ -12,5 +12,5 @@ This project is a Complaints Management System developed using Jakarta EE (JSP +
 ## 📺 System Demonstration Video
 
 Watch the full demonstration here:  
-[JakartaEE Project 2025 - IJSE 71 Sithumini Silva Panadura]([https://www.youtube.com/watch?v=YOUR_VIDEO_ID_HERE](https://youtu.be/AXo-iF7ScKA))
+[JakartaEE Project 2025 - IJSE 71 Sithumini Silva Panadura](https://youtu.be/AXo-iF7ScKA?si=G_aW9qoTbjTg59ND)
 

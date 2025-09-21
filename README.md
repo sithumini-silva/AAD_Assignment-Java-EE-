@@ -9,8 +9,7 @@ This project is a Complaints Management System developed using Jakarta EE (JSP +
 - Admin dashboard with user management and complaint monitoring
 - Light and dark mode toggle for dashboards
 
-📸 Screenshots
-[google Document](https://docs.google.com/document/d/16TRyuGc0SnzEuRYIiN3CyQPXRl6KdTnWBDwQX3N760s/edit?usp=sharing)
+
 
 ## 📺 System Demonstration Video
 
